@@ -72,6 +72,14 @@ describe('graphql-mini-transforms/webpack', () => {
     );
   });
 
+  it('has option for custom ID generate function', async () => {
+    const result = await extractDocumentExport(
+      `query Shop { shop { id } }`,
+      createLoaderContext({loaderOptions: {generateId: () => 'foo'}}),
+    );
+    expect(result).toHaveProperty('id', 'foo');
+  });
+
   describe('import', () => {
     it('adds the resolved import as a dependency', async () => {
       const context = '/app/';
@@ -208,6 +216,7 @@ interface Options {
   context?: string;
   resolve?(context: string, imported: string): string | Error;
   readFile?(file: string): string | Error;
+  loaderOptions?: object;
 }
 
 // This is a limited subset of the loader API that we actually use in our
@@ -216,6 +225,7 @@ function createLoaderContext({
   context = __dirname,
   readFile = () => '',
   resolve = (context, imported) => path.resolve(context, imported),
+  loaderOptions = undefined,
 }: Options = {}): loader.LoaderContext {
   return {
     context,
@@ -251,6 +261,7 @@ function createLoaderContext({
       }
     },
     addDependency() {},
+    query: loaderOptions,
   } as any;
 }
 

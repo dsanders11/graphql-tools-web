@@ -3,13 +3,21 @@ import {dirname} from 'path';
 import {loader} from 'webpack';
 import {parse, DocumentNode} from 'graphql';
 
-import {cleanDocument, extractImports} from './document';
+import {cleanDocument, extractImports, CleanDocumentOptions} from './document';
 
 export default async function graphQLLoader(
   this: loader.LoaderContext,
   source: string | Buffer,
 ) {
   this.cacheable();
+
+  const options = this.query;
+
+  if (options && typeof options !== 'object') {
+    throw new Error(
+      '@shopify/graphql-mini-transforms only supports options as an object',
+    );
+  }
 
   const done = this.async();
 
@@ -20,8 +28,14 @@ export default async function graphQLLoader(
   }
 
   try {
+    const cleanDocumentOptions = {} as CleanDocumentOptions;
+
+    if (options) {
+      cleanDocumentOptions.generateId = options.generateId;
+    }
+
     const document = await loadDocument(source, this.context, this);
-    done(null, `export default ${JSON.stringify(cleanDocument(document))};`);
+    done(null, `export default ${JSON.stringify(cleanDocument(document, cleanDocumentOptions))};`);
   } catch (error) {
     done(error);
   }
