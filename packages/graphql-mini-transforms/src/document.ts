@@ -24,11 +24,16 @@ function defaultGenerateId(normalizedSource: string) {
 export interface CleanDocumentOptions {
   removeUnused?: boolean;
   generateId?(normalizedSource: string): string;
+  includeSource?: boolean;
 }
 
 export function cleanDocument(
   document: DocumentNode,
-  {removeUnused = true, generateId = defaultGenerateId}: CleanDocumentOptions = {},
+  {
+    removeUnused = true,
+    generateId = defaultGenerateId,
+    includeSource = true,
+  }: CleanDocumentOptions = {},
 ) {
   if (removeUnused) {
     removeUnusedDefinitions(document);
@@ -55,7 +60,7 @@ export function cleanDocument(
   });
 
   Reflect.defineProperty(normalizedDocument, 'loc', {
-    value: stripDocumentLoc(normalizedDocument.loc),
+    value: includeSource ? stripDocumentLoc(normalizedDocument.loc) : null,
     enumerable: true,
     writable: false,
     configurable: false,

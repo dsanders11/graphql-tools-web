@@ -30,8 +30,12 @@ export default async function graphQLLoader(
   try {
     const cleanDocumentOptions = {} as CleanDocumentOptions;
 
-    if (options) {
+    if (options && options.generateId) {
       cleanDocumentOptions.generateId = options.generateId;
+    }
+
+    if (options && options.includeSource) {
+      cleanDocumentOptions.includeSource = options.includeSource;
     }
 
     const document = await loadDocument(source, this.context, this);
