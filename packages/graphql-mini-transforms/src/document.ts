@@ -45,7 +45,7 @@ export function cleanDocument(
     stripLoc(definition);
   }
 
-  const id = generateId(normalizedSource);
+  const id = generateId(print(normalizedDocument));
 
   Reflect.defineProperty(normalizedDocument, 'id', {
     value: id,
